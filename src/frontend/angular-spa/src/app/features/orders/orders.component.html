@@ -1,0 +1,41 @@
+<section class="page">
+  <header>
+    <h1>Orders</h1>
+    <p>Track submitted B2B purchase orders.</p>
+  </header>
+
+  @if (store.loading()) {
+    <p class="muted">Loading orders...</p>
+  } @else if (store.error()) {
+    <p class="error">{{ store.error() }}</p>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Order #</th>
+            <th>Customer</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (order of store.orders(); track order.id) {
+            <tr>
+              <td>{{ order.orderNumber }}</td>
+              <td>{{ order.customerName }}</td>
+              <td><span class="badge">{{ order.status }}</span></td>
+              <td>{{ order.totalAmount | currency }}</td>
+              <td>{{ order.createdAt | date: 'short' }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="muted">No orders yet.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

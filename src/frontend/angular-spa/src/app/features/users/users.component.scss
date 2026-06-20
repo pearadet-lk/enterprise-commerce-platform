@@ -1,0 +1,15 @@
+.grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.panel {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.panel h2 {
+  margin-top: 0;
+}

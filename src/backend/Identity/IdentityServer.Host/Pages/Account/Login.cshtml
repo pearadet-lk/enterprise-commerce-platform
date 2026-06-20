@@ -1,0 +1,34 @@
+@page
+@model IdentityServer.Host.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Sign in";
+}
+
+<div class="login-page">
+    <h1>Enterprise Commerce Platform</h1>
+    <p>Sign in to continue</p>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert">@Model.ErrorMessage</div>
+    }
+
+    <form method="post">
+        <input type="hidden" asp-for="ReturnUrl" />
+        <div>
+            <label asp-for="Input.Username">Username</label>
+            <input asp-for="Input.Username" autofocus />
+        </div>
+        <div>
+            <label asp-for="Input.Password">Password</label>
+            <input asp-for="Input.Password" type="password" />
+        </div>
+        <div>
+            <label>
+                <input asp-for="Input.RememberLogin" />
+                Remember me
+            </label>
+        </div>
+        <button type="submit">Sign in</button>
+    </form>
+</div>

@@ -1,0 +1,32 @@
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="logo">ECP</span>
+      <div>
+        <strong>Enterprise Commerce</strong>
+        <small>B2B Ordering Platform</small>
+      </div>
+    </div>
+
+    <nav>
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/products" routerLinkActive="active">Products</a>
+      <a routerLink="/orders" routerLinkActive="active">Orders</a>
+      @if (auth.isAdmin()) {
+        <a routerLink="/users" routerLinkActive="active">Users</a>
+      }
+    </nav>
+
+    <div class="user-panel">
+      @if (auth.userData(); as user) {
+        <p class="name">{{ user.name || user.email || 'Signed in' }}</p>
+        <p class="role">{{ auth.roles().join(', ') || 'User' }}</p>
+      }
+      <button type="button" (click)="auth.logout()">Logout</button>
+    </div>
+  </aside>
+
+  <main>
+    <router-outlet />
+  </main>
+</div>

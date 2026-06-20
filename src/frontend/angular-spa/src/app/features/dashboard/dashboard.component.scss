@@ -1,0 +1,35 @@
+.page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.metric {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0.5rem 0 0;
+}
+
+.metric.small {
+  font-size: 1rem;
+}
+
+.muted {
+  color: #94a3b8;
+}
+
+.error {
+  color: #fca5a5;
+}

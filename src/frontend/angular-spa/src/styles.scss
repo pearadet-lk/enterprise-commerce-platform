@@ -1,0 +1,29 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: Inter, Segoe UI, system-ui, sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.page header h1 {
+  margin: 0 0 0.35rem;
+}
+
+.page header p {
+  margin: 0;
+  color: #94a3b8;
+}
+
+.muted {
+  color: #94a3b8;
+}
+
+.error {
+  color: #fca5a5;
+}

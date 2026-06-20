@@ -1,0 +1,27 @@
+<section class="page">
+  <header>
+    <h1>Admin Dashboard</h1>
+    <p>Platform overview and operational metrics.</p>
+  </header>
+
+  @if (store.loading()) {
+    <p class="muted">Loading dashboard...</p>
+  } @else if (store.error()) {
+    <p class="error">{{ store.error() }}</p>
+  } @else if (store.summary(); as summary) {
+    <div class="cards">
+      <article class="card">
+        <h2>Users</h2>
+        <p class="metric">{{ summary.users }}</p>
+      </article>
+      <article class="card">
+        <h2>Audit Logs</h2>
+        <p class="metric">{{ summary.auditLogs }}</p>
+      </article>
+      <article class="card">
+        <h2>Generated</h2>
+        <p class="metric small">{{ summary.generatedAt | date: 'medium' }}</p>
+      </article>
+    </div>
+  }
+</section>

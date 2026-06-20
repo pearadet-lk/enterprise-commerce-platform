@@ -1,0 +1,36 @@
+## Build
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+*.user
+*.suo
+.vs/
+.idea/
+
+## .NET
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.nupkg
+
+## Node / Angular
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+yarn-error.log*
+
+## Environment
+.env
+.env.*
+!.env.example
+
+## OS
+Thumbs.db
+.DS_Store
+
+## Docker
+docker-compose.override.yml
