@@ -17,13 +17,14 @@ export const authConfig = {
   redirectUrl:
     typeof window !== 'undefined'
       ? window.location.origin + '/auth-callback'
-      : 'http://localhost:4200/auth-callback',
+      : 'http://localhost:9200/auth-callback',
   postLogoutRedirectUri:
-    typeof window !== 'undefined' ? window.location.origin : 'http://localhost:4200',
+    typeof window !== 'undefined' ? window.location.origin : 'http://localhost:9200',
   clientId: 'angular-spa',
   scope: 'openid profile roles catalog-api orders-api users-api',
   responseType: 'code' as const,
   silentRenew: true,
   useRefreshToken: true,
-  renewTimeBeforeTokenExpiresInSeconds: 30
+  renewTimeBeforeTokenExpiresInSeconds: 30,
+  secureRoutes: ['http://localhost:7000/api/', 'http://127.0.0.1:7000/api/']
 };

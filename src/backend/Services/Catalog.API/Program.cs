@@ -21,7 +21,11 @@ builder.Services.AddApiAuthentication(authority, ApiScopes.CatalogApi, validIssu
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("spa", policy =>
-        policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
+        policy.WithOrigins(
+                "http://localhost:9200",
+                "https://localhost:9200",
+                "http://127.0.0.1:9200",
+                "https://127.0.0.1:9200")
             .AllowAnyHeader()
             .AllowAnyMethod());
 });

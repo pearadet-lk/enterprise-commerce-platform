@@ -5,10 +5,10 @@ A B2B ordering platform built with **Angular 22**, **Duende IdentityServer**, an
 ## Architecture
 
 ```
-Angular SPA (4200)
+Angular SPA (9200)
     │ OIDC Authorization Code + PKCE
     ▼
-Duende IdentityServer (5001)
+Duende UI (5001) ──► IdentityServer (internal)
     │ JWT access tokens
     ▼
 API Gateway (7000)
@@ -45,8 +45,9 @@ docker compose up --build
 
 | Service | URL |
 |---------|-----|
-| Angular SPA | http://localhost:4200 |
-| Identity Server | http://localhost:5001 |
+| Angular SPA | http://localhost:9200 |
+| Duende UI (login / OIDC) | http://localhost:5001 |
+| Identity Server (internal) | http://identity:8080 |
 | API Gateway | http://localhost:7000 |
 | Catalog API | http://localhost:5101 |
 | Orders API | http://localhost:5102 |
@@ -61,7 +62,16 @@ docker compose up --build
 | manager | Manager123! | Manager |
 | user | User123! | User |
 
-Sign in at http://localhost:4200/login.
+Sign in at http://localhost:9200/login.
+
+## Duende UI container
+
+Duende login pages must share the same public origin as the IdentityServer endpoints (cookie + redirect requirements). Docker Compose therefore runs:
+
+- **`identity`** — Duende IdentityServer + Razor login UI (internal network only)
+- **`duende-ui`** — nginx reverse proxy exposed on port **5001** (browser-facing Duende frontend)
+
+The Angular SPA and all OIDC redirects continue to use `http://localhost:5001`.
 
 ## Solution Structure
 

@@ -37,11 +37,22 @@ services:
     container_name: ecp-identity
     environment:
       ASPNETCORE_ENVIRONMENT: Docker
-    ports:
-      - "5001:8080"
+    expose:
+      - "8080"
+    volumes:
+      - identity-dpkeys:/app/dpkeys
     depends_on:
       db-init:
         condition: service_completed_successfully
+
+  duende-ui:
+    build:
+      context: ./docker/duende-ui
+    container_name: ecp-duende-ui
+    ports:
+      - "5001:80"
+    depends_on:
+      - identity
 
   catalog-api:
     build:
@@ -111,10 +122,11 @@ services:
       dockerfile: Dockerfile
     container_name: ecp-angular
     ports:
-      - "4200:80"
+      - "9200:80"
     depends_on:
       - gateway
-      - identity
+      - duende-ui
 
 volumes:
   sqlserver-data:
+  identity-dpkeys:

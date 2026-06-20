@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SharedKernel.Constants;
+using System.Security.Claims;
 
 namespace Common.Extensions;
 
@@ -19,10 +20,12 @@ public static class ServiceCollectionExtensions
                 options.Authority = authority;
                 options.Audience = audience;
                 options.RequireHttpsMetadata = false;
+                options.MapInboundClaims = false;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateAudience = true,
                     ValidAudience = audience,
+                    NameClaimType = "name",
                     RoleClaimType = "role"
                 };
 
@@ -34,9 +37,18 @@ public static class ServiceCollectionExtensions
 
         services.AddAuthorization(options =>
         {
-            options.AddPolicy("AdminOnly", policy => policy.RequireRole(Roles.Admin));
-            options.AddPolicy("ManagerOrAdmin", policy =>
-                policy.RequireRole(Roles.Admin, Roles.Manager));
+            options.AddPolicy("AdminOnly", policy => policy.RequireAssertion(context =>
+                context.User.IsInRole(Roles.Admin) ||
+                context.User.HasClaim("role", Roles.Admin) ||
+                context.User.HasClaim(ClaimTypes.Role, Roles.Admin)));
+
+            options.AddPolicy("ManagerOrAdmin", policy => policy.RequireAssertion(context =>
+                context.User.IsInRole(Roles.Admin) ||
+                context.User.IsInRole(Roles.Manager) ||
+                context.User.HasClaim("role", Roles.Admin) ||
+                context.User.HasClaim("role", Roles.Manager) ||
+                context.User.HasClaim(ClaimTypes.Role, Roles.Admin) ||
+                context.User.HasClaim(ClaimTypes.Role, Roles.Manager)));
         });
 
         return services;

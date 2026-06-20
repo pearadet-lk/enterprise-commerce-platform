@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
-import { map } from 'rxjs';
+import { catchError, map, of } from 'rxjs';
 
 export interface UserData {
   sub?: string;
@@ -50,6 +50,9 @@ export class AuthService {
   }
 
   checkAuth() {
-    return this.oidc.checkAuth().pipe(map(({ isAuthenticated }) => isAuthenticated));
+    return this.oidc.checkAuth().pipe(
+      map(({ isAuthenticated }) => isAuthenticated),
+      catchError(() => of(false))
+    );
   }
 }

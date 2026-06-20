@@ -55,18 +55,24 @@ public static class IdentityConfig
             AllowOfflineAccess = true,
             RedirectUris =
             {
-                "http://localhost:4200/auth-callback",
-                "https://localhost:4200/auth-callback"
+                "http://localhost:9200/auth-callback",
+                "https://localhost:9200/auth-callback",
+                "http://127.0.0.1:9200/auth-callback",
+                "https://127.0.0.1:9200/auth-callback"
             },
             PostLogoutRedirectUris =
             {
-                "http://localhost:4200",
-                "https://localhost:4200"
+                "http://localhost:9200",
+                "https://localhost:9200",
+                "http://127.0.0.1:9200",
+                "https://127.0.0.1:9200"
             },
             AllowedCorsOrigins =
             {
-                "http://localhost:4200",
-                "https://localhost:4200"
+                "http://localhost:9200",
+                "https://localhost:9200",
+                "http://127.0.0.1:9200",
+                "https://127.0.0.1:9200"
             },
             AllowedScopes =
             {

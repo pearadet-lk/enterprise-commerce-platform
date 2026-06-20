@@ -16,9 +16,11 @@ public static class GatewayServiceCollectionExtensions
             {
                 options.Authority = authority;
                 options.RequireHttpsMetadata = false;
+                options.MapInboundClaims = false;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateAudience = false,
+                    NameClaimType = "name",
                     RoleClaimType = "role"
                 };
 

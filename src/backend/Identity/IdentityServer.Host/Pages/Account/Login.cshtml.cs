@@ -1,7 +1,5 @@
 using Duende.IdentityServer.Services;
-using Duende.IdentityServer.Stores;
 using IdentityServer.Host.Data;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -17,7 +15,9 @@ public class LoginModel(
     [BindProperty]
     public InputModel Input { get; set; } = new();
 
+    [BindProperty(SupportsGet = true)]
     public string? ReturnUrl { get; set; }
+
     public string? ErrorMessage { get; set; }
 
     public class InputModel
@@ -31,16 +31,15 @@ public class LoginModel(
         public bool RememberLogin { get; set; }
     }
 
-    public async Task OnGetAsync(string? returnUrl)
+    public Task OnGetAsync()
     {
-        ReturnUrl = returnUrl ?? Url.Content("~/");
-        await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+        // Do not sign out here: clearing the auth cookie after a successful POST breaks the
+        // redirect to /connect/authorize/callback on plain HTTP (SameSite=None without Secure).
+        return Task.CompletedTask;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        ReturnUrl ??= Url.Content("~/");
-
         if (!ModelState.IsValid)
         {
             return Page();
@@ -61,23 +60,29 @@ public class LoginModel(
             Input.RememberLogin,
             lockoutOnFailure: true);
 
-        if (result.Succeeded)
+        if (!result.Succeeded)
         {
-            var context = await interaction.GetAuthorizationContextAsync(ReturnUrl, CancellationToken.None);
-            if (context is not null)
-            {
-                return Redirect(ReturnUrl);
-            }
+            ErrorMessage = result.IsLockedOut ? "Account locked out." : "Invalid credentials.";
+            return Page();
+        }
 
-            if (Url.IsLocalUrl(ReturnUrl))
-            {
-                return Redirect(ReturnUrl);
-            }
+        var context = await interaction.GetAuthorizationContextAsync(ReturnUrl, CancellationToken.None);
+        if (context is not null)
+        {
+            return Redirect(ReturnUrl!);
+        }
 
+        if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+        {
+            return Redirect(ReturnUrl);
+        }
+
+        if (string.IsNullOrEmpty(ReturnUrl))
+        {
             return Redirect("~/");
         }
 
-        ErrorMessage = result.IsLockedOut ? "Account locked out." : "Invalid credentials.";
+        ErrorMessage = "Invalid return URL.";
         return Page();
     }
 }

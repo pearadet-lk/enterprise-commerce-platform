@@ -65,6 +65,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "port": 9200
+          },
           "configurations": {
             "production": {
               "buildTarget": "angular-spa:build:production"
