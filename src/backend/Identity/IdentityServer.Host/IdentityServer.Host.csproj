@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\BuildingBlocks\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\SharedKernel\SharedKernel.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\Common\Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

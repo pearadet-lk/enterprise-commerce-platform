@@ -38,7 +38,8 @@ export class OrdersStore {
         this.http.get<Order[]>(`${this.env.apiGatewayUrl}/api/orders/orders`)
       );
       this.orders.set(orders);
-    } catch {
+    } catch (err) {
+      console.error('Failed to load orders.', err);
       this.error.set('Unable to load orders.');
     } finally {
       this.loading.set(false);

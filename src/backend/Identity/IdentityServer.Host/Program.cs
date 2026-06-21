@@ -1,3 +1,4 @@
+using Common.Extensions;
 using Duende.IdentityServer;
 using IdentityServer.Host;
 using IdentityServer.Host.Config;
@@ -10,6 +11,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddPlatformOpenTelemetry("identity-server");
+builder.AddPlatformCrossCutting();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -64,7 +68,7 @@ builder.Services
     .AddInMemoryIdentityResources(IdentityConfig.IdentityResources)
     .AddInMemoryApiScopes(IdentityConfig.ApiScopes)
     .AddInMemoryApiResources(IdentityConfig.ApiResources)
-    .AddInMemoryClients(IdentityConfig.Clients)
+    .AddInMemoryClients(IdentityConfig.GetClients(builder.Configuration))
     .AddAspNetIdentity<ApplicationUser>()
     .AddProfileService<ProfileService>();
 
@@ -77,20 +81,7 @@ builder.Services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.Ap
     options.Cookie.Path = "/";
 });
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("spa", policy =>
-    {
-        policy.WithOrigins(
-                "http://localhost:9200",
-                "https://localhost:9200",
-                "http://127.0.0.1:9200",
-                "https://127.0.0.1:9200")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
-    });
-});
+builder.Services.AddPlatformCors(builder.Configuration);
 
 builder.Services.AddRazorPages();
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -105,13 +96,10 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "Docker")
-{
-    app.UseDeveloperExceptionPage();
-}
+app.UsePlatformMiddleware();
 
 app.UseForwardedHeaders();
-app.UseCors("spa");
+app.UsePlatformCors();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();

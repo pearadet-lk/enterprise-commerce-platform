@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: enterprise-commerce-platform-minikube
+  labels:
+    ecp.dev/mode: minikube
+    app.kubernetes.io/name: enterprise-commerce-platform

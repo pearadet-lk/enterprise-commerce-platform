@@ -34,3 +34,7 @@ Thumbs.db
 
 ## Docker
 docker-compose.override.yml
+
+## Deploy scripts (runtime)
+deploy/scripts/.minikube-port-forward.pids
+deploy/scripts/.minikube-tunnel.pid

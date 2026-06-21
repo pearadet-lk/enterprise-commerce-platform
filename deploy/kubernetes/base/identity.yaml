@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: identity
+  template:
+    metadata:
+      labels:
+        app: identity
+    spec:
+      containers:
+        - name: ecp-identity
+          image: ecp/identity-server:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Kubernetes
+            - name: ASPNETCORE_URLS
+              value: http://+:8080
+            - name: Identity__IssuerUri
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-env
+                  key: IDENTITY_PUBLIC_URL
+            - name: SpaClient__RedirectUris__0
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-env
+                  key: SPA_REDIRECT_URI
+            - name: SpaClient__PostLogoutRedirectUris__0
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-env
+                  key: SPA_POST_LOGOUT_URI
+            - name: SpaClient__AllowedCorsOrigins__0
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-env
+                  key: SPA_PUBLIC_URL
+            - name: Cors__AllowedOriginsCsv
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-env
+                  key: CORS_ALLOWED_ORIGINS
+            - name: Cors__AllowCredentials
+              value: "true"
+            - name: ECP_DEPLOY_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-env
+                  key: ECP_DEPLOY_MODE
+          volumeMounts:
+            - name: dpkeys
+              mountPath: /app/dpkeys
+          readinessProbe:
+            httpGet:
+              path: /.well-known/openid-configuration
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+      volumes:
+        - name: dpkeys
+          persistentVolumeClaim:
+            claimName: identity-dpkeys
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity
+spec:
+  selector:
+    app: identity
+  ports:
+    - port: 8080
+      targetPort: 8080

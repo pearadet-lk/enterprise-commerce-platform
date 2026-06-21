@@ -1,0 +1,236 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: catalog-api
+  template:
+    metadata:
+      labels:
+        app: catalog-api
+    spec:
+      containers:
+        - name: ecp-catalog-api
+          image: ecp/catalog-api:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Kubernetes
+            - name: ASPNETCORE_URLS
+              value: http://+:8080
+            - name: Identity__ValidIssuer
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-env
+                  key: IDENTITY_PUBLIC_URL
+            - name: Cors__AllowedOriginsCsv
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-env
+                  key: CORS_ALLOWED_ORIGINS
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog-api
+spec:
+  selector:
+    app: catalog-api
+  ports:
+    - port: 8080
+      targetPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orders-api
+  template:
+    metadata:
+      labels:
+        app: orders-api
+    spec:
+      containers:
+        - name: ecp-orders-api
+          image: ecp/orders-api:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Kubernetes
+            - name: ASPNETCORE_URLS
+              value: http://+:8080
+            - name: Identity__ValidIssuer
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-env
+                  key: IDENTITY_PUBLIC_URL
+            - name: Cors__AllowedOriginsCsv
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-env
+                  key: CORS_ALLOWED_ORIGINS
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders-api
+spec:
+  selector:
+    app: orders-api
+  ports:
+    - port: 8080
+      targetPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: users-api
+  template:
+    metadata:
+      labels:
+        app: users-api
+    spec:
+      containers:
+        - name: ecp-users-api
+          image: ecp/users-api:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Kubernetes
+            - name: ASPNETCORE_URLS
+              value: http://+:8080
+            - name: Identity__ValidIssuer
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-env
+                  key: IDENTITY_PUBLIC_URL
+            - name: Cors__AllowedOriginsCsv
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-env
+                  key: CORS_ALLOWED_ORIGINS
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-api
+spec:
+  selector:
+    app: users-api
+  ports:
+    - port: 8080
+      targetPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      containers:
+        - name: ecp-gateway
+          image: ecp/gateway:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Kubernetes
+            - name: ASPNETCORE_URLS
+              value: http://+:8080
+            - name: Identity__ValidIssuer
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-env
+                  key: IDENTITY_PUBLIC_URL
+            - name: Cors__AllowedOriginsCsv
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-env
+                  key: CORS_ALLOWED_ORIGINS
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+spec:
+  selector:
+    app: gateway
+  ports:
+    - port: 8080
+      targetPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: angular
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: angular
+  template:
+    metadata:
+      labels:
+        app: angular
+    spec:
+      containers:
+        - name: ecp-angular
+          image: ecp/angular-spa:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: app-config
+              mountPath: /usr/share/nginx/html/app-config.json
+              subPath: app-config.json
+      volumes:
+        - name: app-config
+          configMap:
+            name: angular-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: angular
+spec:
+  selector:
+    app: angular
+  ports:
+    - port: 80
+      targetPort: 80

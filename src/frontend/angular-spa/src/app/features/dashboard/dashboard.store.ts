@@ -34,7 +34,8 @@ export class DashboardStore {
         auditLogs: data.auditLogs,
         generatedAt: data.generatedAt
       });
-    } catch {
+    } catch (err) {
+      console.error('Failed to load dashboard summary.', err);
       this.error.set('Unable to load dashboard summary.');
     } finally {
       this.loading.set(false);

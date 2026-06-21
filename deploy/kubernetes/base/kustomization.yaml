@@ -1,0 +1,40 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - secret-sql.yaml
+  - pvc.yaml
+  - sqlserver.yaml
+  - job-db-init.yaml
+  - jaeger.yaml
+  - duende-ui.yaml
+  - identity.yaml
+  - apps.yaml
+  - services-external.yaml
+
+configMapGenerator:
+  - name: db-init-sql
+    files:
+      - database/init.sql
+    options:
+      disableNameSuffixHash: true
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: enterprise-commerce-platform
+      app.kubernetes.io/name: enterprise-commerce-platform
+      app.kubernetes.io/managed-by: kustomize
+
+images:
+  - name: ecp/identity-server
+    newTag: local
+  - name: ecp/catalog-api
+    newTag: local
+  - name: ecp/orders-api
+    newTag: local
+  - name: ecp/users-api
+    newTag: local
+  - name: ecp/gateway
+    newTag: local
+  - name: ecp/angular-spa
+    newTag: local

@@ -31,7 +31,8 @@ export class ProductsStore {
         this.http.get<Product[]>(`${this.env.apiGatewayUrl}/api/catalog/products`)
       );
       this.products.set(products);
-    } catch {
+    } catch (err) {
+      console.error('Failed to load products.', err);
       this.error.set('Unable to load products.');
     } finally {
       this.loading.set(false);

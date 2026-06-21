@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: enterprise-commerce-platform-minikube
+
+resources:
+  - namespace.yaml
+  - ../../base
+
+configMapGenerator:
+  - name: platform-env
+    envs:
+      - platform.env
+    options:
+      disableNameSuffixHash: true
+  - name: angular-config
+    files:
+      - app-config.json=angular-config.json
+    options:
+      disableNameSuffixHash: true
+
+labels:
+  - pairs:
+      ecp.dev/mode: minikube

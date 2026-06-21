@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: duende-ui-external
+spec:
+  type: ClusterIP
+  selector:
+    app: duende-ui
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-external
+spec:
+  type: ClusterIP
+  selector:
+    app: gateway
+  ports:
+    - port: 8080
+      targetPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: angular-external
+spec:
+  type: ClusterIP
+  selector:
+    app: angular
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jaeger-external
+spec:
+  type: ClusterIP
+  selector:
+    app: jaeger
+  ports:
+    - port: 16686
+      targetPort: 16686

@@ -42,7 +42,8 @@ export class UsersStore {
         this.http.get<UserProfile[]>(`${this.env.apiGatewayUrl}/api/users/users`)
       );
       this.users.set(users);
-    } catch {
+    } catch (err) {
+      console.error('Failed to load users.', err);
       this.error.set('Unable to load users.');
     } finally {
       this.loading.set(false);
@@ -58,7 +59,8 @@ export class UsersStore {
         this.http.get<AuditLog[]>(`${this.env.apiGatewayUrl}/api/auditlogs/auditlogs`)
       );
       this.auditLogs.set(logs);
-    } catch {
+    } catch (err) {
+      console.error('Failed to load audit logs.', err);
       this.error.set('Unable to load audit logs.');
     } finally {
       this.loading.set(false);

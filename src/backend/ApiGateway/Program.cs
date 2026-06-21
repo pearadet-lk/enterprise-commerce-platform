@@ -2,6 +2,9 @@ using Common.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddPlatformOpenTelemetry("api-gateway");
+builder.AddPlatformCrossCutting();
+
 var authority = builder.Configuration["Identity:Authority"] ?? "http://localhost:5001";
 var validIssuer = builder.Configuration["Identity:ValidIssuer"];
 
@@ -10,23 +13,15 @@ builder.Services.AddReverseProxy()
 
 builder.Services.AddGatewayAuthentication(authority, validIssuer);
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("spa", policy =>
-        policy.WithOrigins(
-                "http://localhost:9200",
-                "https://localhost:9200",
-                "http://127.0.0.1:9200",
-                "https://127.0.0.1:9200")
-            .AllowAnyHeader()
-            .AllowAnyMethod());
-});
+builder.Services.AddPlatformCors(builder.Configuration);
 
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
-app.UseCors("spa");
+app.UsePlatformMiddleware();
+app.UsePlatformCors();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapReverseProxy();

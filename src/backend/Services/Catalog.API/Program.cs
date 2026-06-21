@@ -5,6 +5,9 @@ using SharedKernel.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddPlatformOpenTelemetry("catalog-api");
+builder.AddPlatformCrossCutting();
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -18,26 +21,18 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddApiAuthentication(authority, ApiScopes.CatalogApi, validIssuer);
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("spa", policy =>
-        policy.WithOrigins(
-                "http://localhost:9200",
-                "https://localhost:9200",
-                "http://127.0.0.1:9200",
-                "https://127.0.0.1:9200")
-            .AllowAnyHeader()
-            .AllowAnyMethod());
-});
+builder.Services.AddPlatformCors(builder.Configuration);
 
 var app = builder.Build();
+
+app.UsePlatformMiddleware();
+app.UsePlatformCors();
 
 if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "Docker")
 {
     app.MapOpenApi();
 }
 
-app.UseCors("spa");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

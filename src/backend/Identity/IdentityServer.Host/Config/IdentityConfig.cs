@@ -1,12 +1,37 @@
 using Duende.IdentityModel;
 using Duende.IdentityServer;
 using Duende.IdentityServer.Models;
+using Microsoft.Extensions.Configuration;
 using ApiScopeNames = SharedKernel.Constants.ApiScopes;
 
 namespace IdentityServer.Host.Config;
 
 public static class IdentityConfig
 {
+    private static readonly string[] DefaultRedirectUris =
+    [
+        "http://localhost:9200/auth-callback",
+        "https://localhost:9200/auth-callback",
+        "http://127.0.0.1:9200/auth-callback",
+        "https://127.0.0.1:9200/auth-callback"
+    ];
+
+    private static readonly string[] DefaultPostLogoutUris =
+    [
+        "http://localhost:9200",
+        "https://localhost:9200",
+        "http://127.0.0.1:9200",
+        "https://127.0.0.1:9200"
+    ];
+
+    private static readonly string[] DefaultCorsOrigins =
+    [
+        "http://localhost:9200",
+        "https://localhost:9200",
+        "http://127.0.0.1:9200",
+        "https://127.0.0.1:9200"
+    ];
+
     public static IEnumerable<IdentityResource> IdentityResources =>
     [
         new IdentityResources.OpenId(),
@@ -43,50 +68,53 @@ public static class IdentityConfig
         }
     ];
 
-    public static IEnumerable<Client> Clients =>
-    [
-        new Client
+    public static IEnumerable<Client> GetClients(IConfiguration configuration)
+    {
+        var redirectUris = ReadUris(configuration, "SpaClient:RedirectUris", DefaultRedirectUris);
+        var postLogoutUris = ReadUris(configuration, "SpaClient:PostLogoutRedirectUris", DefaultPostLogoutUris);
+        var corsOrigins = ReadUris(configuration, "SpaClient:AllowedCorsOrigins", DefaultCorsOrigins);
+
+        return
+        [
+            new Client
+            {
+                ClientId = "angular-spa",
+                ClientName = "Enterprise Commerce Angular SPA",
+                AllowedGrantTypes = GrantTypes.Code,
+                RequirePkce = true,
+                RequireClientSecret = false,
+                AllowOfflineAccess = true,
+                RedirectUris = redirectUris,
+                PostLogoutRedirectUris = postLogoutUris,
+                AllowedCorsOrigins = corsOrigins,
+                AllowedScopes =
+                {
+                    IdentityServerConstants.StandardScopes.OpenId,
+                    IdentityServerConstants.StandardScopes.Profile,
+                    "roles",
+                    ApiScopeNames.CatalogApi,
+                    ApiScopeNames.OrdersApi,
+                    ApiScopeNames.UsersApi
+                },
+                AccessTokenLifetime = 3600,
+                RefreshTokenUsage = TokenUsage.OneTimeOnly,
+                RefreshTokenExpiration = TokenExpiration.Sliding,
+                SlidingRefreshTokenLifetime = 1296000
+            }
+        ];
+    }
+
+    private static ICollection<string> ReadUris(
+        IConfiguration configuration,
+        string sectionName,
+        IEnumerable<string> defaults)
+    {
+        var configured = configuration.GetSection(sectionName).Get<string[]>();
+        if (configured is null || configured.Length == 0)
         {
-            ClientId = "angular-spa",
-            ClientName = "Enterprise Commerce Angular SPA",
-            AllowedGrantTypes = GrantTypes.Code,
-            RequirePkce = true,
-            RequireClientSecret = false,
-            AllowOfflineAccess = true,
-            RedirectUris =
-            {
-                "http://localhost:9200/auth-callback",
-                "https://localhost:9200/auth-callback",
-                "http://127.0.0.1:9200/auth-callback",
-                "https://127.0.0.1:9200/auth-callback"
-            },
-            PostLogoutRedirectUris =
-            {
-                "http://localhost:9200",
-                "https://localhost:9200",
-                "http://127.0.0.1:9200",
-                "https://127.0.0.1:9200"
-            },
-            AllowedCorsOrigins =
-            {
-                "http://localhost:9200",
-                "https://localhost:9200",
-                "http://127.0.0.1:9200",
-                "https://127.0.0.1:9200"
-            },
-            AllowedScopes =
-            {
-                IdentityServerConstants.StandardScopes.OpenId,
-                IdentityServerConstants.StandardScopes.Profile,
-                "roles",
-                ApiScopeNames.CatalogApi,
-                ApiScopeNames.OrdersApi,
-                ApiScopeNames.UsersApi
-            },
-            AccessTokenLifetime = 3600,
-            RefreshTokenUsage = TokenUsage.OneTimeOnly,
-            RefreshTokenExpiration = TokenExpiration.Sliding,
-            SlidingRefreshTokenLifetime = 1296000
+            return defaults.ToList();
         }
-    ];
+
+        return configured.Concat(defaults).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+    }
 }
